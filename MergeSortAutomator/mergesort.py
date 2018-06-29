@@ -174,38 +174,26 @@ f1.write("//Odd-Even Merge Sort\n")
 f1.write("//Systolic Recursive Tree Architecture\n")
 f1.write("//Author: K.Bharati, IIITDM KANCEEPURAM\n")
 f1.write("//Date: June 2018\n")
-
 f1.write("package moduleOEMS;\n")
-
 f1.write("// ================================================================\n")
 f1.write("// Project imports\n")
-
 f1.write("import Vector         :: *;\n")
-
 f1.write("typedef %d NUM_ELEMENTS;\n"% (NUM_ELEMENTS))
-
 f1.write("// ================================================================\n")
 f1.write("// Interface for the Odd-Even Merge sort module\n")
-
 f1.write("interface OEMSort_IFC;\n")
 f1.write("   method Action start( Int#(32) j);\n")
 f1.write("   method Action finishload();\n")
 f1.write("   method Action completesort();\n")
 f1.write("   method int getsortvalue();\n")
 f1.write("endinterface\n")
-
 f1.write("(* synthesize *)\n")
 f1.write("module mkOEMsort (OEMSort_IFC);\n")
-
 f1.write("//For the proposed parallel sorting algorithm\n")
-
 f1.write("//We can use a step counter. For a fact, we know that given N elements, the sort takes\n")
 f1.write("//place in atmost in (log N)*(log N) steps\n")
-
 f1.write("	//This register holds the number of processing steps done at any instance, max of which is (log N)^2 \n")
-
 f1.write("	Reg#(Int#(32)) rg_sc <- mkReg (0);\n")
-
 f1.write("  	Vector#(NUM_ELEMENTS,Reg#(Int#(32))) a00 <- replicateM( mkRegU );\n")
 f1.write("        Reg#(Int#(32)) step <- mkReg(1);\n")
 
@@ -218,19 +206,14 @@ for i in circtype:
 			if d1[inptype[i][j][k]] > 0:
 			 		f1.write( "Vector#(%d, Reg#(Int #(32))) %c%d%d <- replicateM ( mkReg(0) );\n" % (NUM_ELEMENTS, inptype[i][j][k], inplevel[i][j][k], inpsublevel[i][j][k]))
 f1.write(  "Vector#(%d, Reg#(Int #(32))) %c%d%d <- replicateM ( mkReg(0) );\n" % (NUM_ELEMENTS, merge.pmodu, merge.plevel, merge.psublevel))	
-
 f1.write("// ================================================================\n")
-
 f1.write("// Rules\n")
-
 f1.write("// After step 1, the Odd-even Merge Sort starts\n")
 f1.write("// At every step, the rg_sc is incremented which helps in\n")
 f1.write("// identifying the end of all steps.\n")
- 
 f1.write("rule inc_count ( (step == 2) && (rg_sc < %d) );\n" % ( (log(NUM_ELEMENTS)/log(2))*(log(NUM_ELEMENTS)/log(2)) )  )
 f1.write("	rg_sc <= rg_sc + 1;\n")
 f1.write("endrule\n")
-
 f1.write("rule startsort (step==2);\n")
 
 merge.pmodu='a'
@@ -239,49 +222,34 @@ merge.psublevel=0
 sort(0, NUM_ELEMENTS, 0,0,1);
 
 f1.write("endrule\n")
-	
 f1.write("rule swap_out (step == 3);\n")
 f1.write("	 for (Int#(32) k = 0; k < fromInteger(valueof(NUM_ELEMENTS))-1; k = k+1)\n")
 f1.write("             %c%d%d[k] <= %c%d%d[k+1];\n" % (merge.pmodu, merge.plevel, merge.psublevel,merge.pmodu, merge.plevel, merge.psublevel))
-
 f1.write("endrule\n")
-
 f1.write("// ================================================================\n")
-
 f1.write("// Interfaces\n")
-
 f1.write("//The start method is called NUM_ELEMENTS times by the Tb\n")
 f1.write("//Each time, it accepts an integer and shifts it into the systolic array\n")
-
 f1.write("   method Action start(Int#(32) j) if (step==1); \n")
 f1.write("        a00[0] <= j; \n")
 f1.write("        for (Int#(32) k = 0; k < fromInteger(valueof(NUM_ELEMENTS))-1; k = k+1)\n")
 f1.write("             a00[k+1] <= a00[k];\n")
 f1.write("   endmethod\n")
-   
 f1.write(" //This method is triggered by the Tb when the last element of A00\n")
 f1.write(" //is loaded into the 1D systolic array\n")
-
 f1.write("    method Action finishload();\n")
 f1.write("         step <= 2;\n")
 f1.write("        endmethod\n")
-
 f1.write("   method Action completesort() if(rg_sc==%d);\n" % ( (log(NUM_ELEMENTS)/log(2))*(log(NUM_ELEMENTS)/log(2)) )  )
 f1.write("    	step <= 3;\n")
 f1.write("    endmethod\n")
-
 f1.write("   method int getsortvalue();\n")
 f1.write("    	return %c%d%d[0];\n" % (merge.pmodu, merge.plevel, merge.psublevel))
 f1.write("    endmethod\n")
-
 f1.write("endmodule: mkOEMsort\n")
-
 f1.write("// ================================================================\n")
-
 f1.write("endpackage: moduleOEMS\n")
 f1.close()
-
-
 
 #Testbench
 f=open("TestbenchOEMS.bsv", "w")
@@ -291,12 +259,9 @@ f.write("import moduleOEMS     :: *;\n")
 f.write( "import LFSR           :: *;\n")
 f.write( "import Vector		:: *;\n")
 f.write(" typedef %d NUM_ELEMENTS;\n"% (NUM_ELEMENTS))
-
 f.write("(* synthesize *)\n")
-
 f.write("module mkTestbench (Empty); //Empty since it is the top module\n")
 f.write("	OEMSort_IFC m <- mkOEMsort ();\n")
-	
 f.write("LFSR #(Bit #(32)) myrand <- mkLFSR_32;\n")
 f.write("Vector #(NUM_ELEMENTS,Reg#(Int#(32))) inp_arr <- replicateM(mkRegU);\n")
 f.write("Vector #(NUM_ELEMENTS,Reg#(Int#(32))) out_arr <- replicateM(mkRegU);\n")
@@ -304,31 +269,23 @@ f.write("Reg#(Bool) mystart <- mkReg(False);\n")
 f.write("Reg#(Int#(32)) count <- mkReg(0);\n")
 f.write("Reg#(Bool) myFinish <- mkReg(False);\n")
 f.write("Reg#(Bool) myPrint <- mkReg(False);\n")
-
 f.write("(* descending_urgency = \"rl_inp, r1_go, rl_finish, rl_dump, rl_print \"*)\n")
-
 f.write("//This rule assigns the values for inp_arr and makes mystart <= True.\n")
-
 f.write("rule rl_inp( !mystart);\n")
 f.write("	inp_arr[0] <= unpack(myrand.value()); \n")
 f.write("	myrand.next();\n")
 f.write("	mystart <= True;\n")
-
 f.write("endrule\n")
-
 f.write("//This rule starts after rl_inp. It pushes the inp_arr values one by one \n")
 f.write("//into the 1D systolic array and while pushing the last element, it triggers\n")
 f.write("//the finishload method indicating to the 1D array that it has finished loading.\n")
-
 f.write("rule r1_go ( (mystart) && (count < fromInteger(valueof(NUM_ELEMENTS))));\n")
-	
 f.write("	m.start(inp_arr[count]);\n")
 f.write("	inp_arr[count+1] <= unpack(myrand.value());\n")
 f.write("	myrand.next();\n")
 f.write("	count <= count + 1;\n")
 f.write("	if (count == fromInteger(valueof(NUM_ELEMENTS))-1) m.finishload();\n")
 f.write("endrule\n")
-
 f.write("rule rl_finish(!myFinish);\n")
 f.write("	m.completesort();\n")
 f.write("	$display(\"The unsorted sequence is : \");\n")
@@ -336,28 +293,19 @@ f.write("	for(Integer i=0; i < fromInteger (valueof(NUM_ELEMENTS)); i=i+1)\n")
 f.write("		$display (\"%d \",inp_arr[i]);\n") 
 f.write("	myFinish <= True;\n")
 f.write("	count <=0;\n")
-	
 f.write("endrule\n")
-
 f.write("rule rl_dump ( (myFinish) && (count < fromInteger(valueof(NUM_ELEMENTS))));\n")
-	
 f.write("	out_arr[count] <= m.getsortvalue();\n")
 f.write("	count <= count + 1;\n")
 f.write("	if (count == fromInteger(valueof(NUM_ELEMENTS))-1) myPrint <= True;\n")
-	
 f.write("endrule\n")
-
 f.write("rule rl_print (myPrint);\n")
-
 f.write("	$display(\"The Sorted sequence is : \");\n")
 f.write("	for(Integer i=0; i < fromInteger (valueof(NUM_ELEMENTS)); i=i+1)\n")
 f.write("		$display (\"%d \",out_arr[i]);\n") 
 f.write("	$finish;\n")
-
 f.write("endrule\n")
-
 f.write("endmodule: mkTestbench\n")
-
 f.write("endpackage: TestbenchOEMS\n")
 f.close()
 
