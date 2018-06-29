@@ -1,4 +1,0 @@
-1. Open the mergesort.py file and edit NUM_ELEMENTS
-2. Execute the mergesort.py using python
-3. A testbench and module will be automatically generated.
-4. Use the Makefile to compile and run. (You may have to change the directories)
