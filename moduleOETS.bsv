@@ -34,13 +34,7 @@ interface OETSort_IFC;
 endinterface
 
 // ================================================================
-// Odd-even transpositiono sort module (defined)
-
-// NS: Don't need a parameter here. Changing NUM_ELEMENTS will change
-// the number of elements being sorted
-// If you want to be able to instantiate the module with different number
-// of elements, mentioned in the interface, you could add the poly-
-// morphism to the interface
+// Odd-even transposition sort module (defined)
 
 (* synthesize *)
 module mkOETsort (OETSort_IFC);
@@ -70,13 +64,14 @@ module mkOETsort (OETSort_IFC);
 // At every step, the rg_sc is decremented which helps in
 // identifying whether the step is an odd step or an even step
 // and also the end of all steps.
- 
+
+//Rule 1
 rule inc_count ( (step == 2) && (rg_sc < fromInteger(valueof(NUM_ELEMENTS))) );		
 	rg_sc <= rg_sc + 1;
 endrule
 
 (* descending_urgency = " ro_swap, re_swap, swap_out"*)
-//Rule 3.1: Odd step sort
+//Rule 2.1: Odd step sort
  
 rule ro_swap( (rg_sc %2 == 0) && (step == 2) );
 
@@ -88,7 +83,7 @@ rule ro_swap( (rg_sc %2 == 0) && (step == 2) );
        
 endrule
 
-//Rule 3.2 Even step sort
+//Rule 2.2 Even step sort
 
 rule re_swap ( (rg_sc % 2 == 1) && (step ==2));
 	for (Bit#(32) i=0; i<= fromInteger (valueof(NUM_ELEMENTS))-2; i=i+2) 
@@ -97,7 +92,8 @@ rule re_swap ( (rg_sc % 2 == 1) && (step ==2));
 			
 		end
 endrule
-		
+
+//Rule 3
 rule swap_out (step == 3);
 	 for (Int#(32) k = 0; k < fromInteger(valueof(NUM_ELEMENTS))-1; k = k+1)
              arr[k] <= arr[k+1];
